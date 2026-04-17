@@ -1,4 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import { fallbackQuestions } from "./fallback";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -8,6 +9,9 @@ export interface EquationData {
   difficulty: string;
   hint: string;
 }
+
+const timeoutPromise = (ms: number) => 
+  new Promise<never>((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), ms));
 
 export async function generateEquations(
   mode: string,
@@ -33,7 +37,7 @@ export async function generateEquations(
   ]`;
 
   try {
-    const response = await ai.models.generateContent({
+    const apiCall = ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
@@ -54,17 +58,55 @@ export async function generateEquations(
       },
     });
 
+    // Race the API call against a 20-second timeout
+    const response = await Promise.race([apiCall, timeoutPromise(20000)]);
+
     const text = response.text || "[]";
     const data: EquationData[] = JSON.parse(text);
     return data;
   } catch (error) {
-    console.error("Error generating equations:", error);
-    // Fallback data if API fails to prevent game crash
-    return Array.from({ length: count }).map((_, i) => ({
-      equation: `${i + 1} + ${i * 2}`,
-      answer: (i + 1) + (i * 2),
-      difficulty: "easy",
-      hint: "Basic addition",
-    }));
+    console.error("API failed or timed out. Falling back to local emergency data:", error);
+    
+    // Attempt to match the exact mode and grade first
+    let matchingFallback = fallbackQuestions.filter(
+      q => q.mode.toLowerCase() === mode.toLowerCase() && q.grade.toLowerCase() === grade.toLowerCase()
+    );
+
+    // If no strict match found, fallback to anything in that mode
+    if (matchingFallback.length === 0) {
+       matchingFallback = fallbackQuestions.filter(q => q.mode.toLowerCase() === mode.toLowerCase());
+    }
+    
+    // If absolutely nothing matches, use everything to prevent a soft-lock
+    if (matchingFallback.length === 0) {
+      matchingFallback = fallbackQuestions;
+    }
+
+    // Multiply or slice the array to fulfill the exact 'count' required for the game
+    const populatedSet: EquationData[] = [];
+    for (let i = 0; i < count; i++) {
+        const sourceEq = matchingFallback[i % matchingFallback.length];
+        
+        // Slightly randomize values for variations if we have to loop 
+        // to prevent pure identical repeats during long sessions.
+        if (i >= matchingFallback.length && sourceEq.mode === 'addition') {
+             const variation = Math.floor(Math.random() * 5) + 1;
+             populatedSet.push({
+                 equation: `${sourceEq.equation} + ${variation}`,
+                 answer: sourceEq.answer + variation,
+                 difficulty: sourceEq.difficulty,
+                 hint: sourceEq.hint
+             });
+        } else {
+             populatedSet.push({ 
+                 equation: sourceEq.equation, 
+                 answer: sourceEq.answer, 
+                 difficulty: sourceEq.difficulty, 
+                 hint: sourceEq.hint 
+             });
+        }
+    }
+    
+    return populatedSet;
   }
 }
