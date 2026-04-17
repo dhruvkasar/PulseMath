@@ -6,9 +6,10 @@ import { GameOver } from './components/GameOver';
 import { generateEquations, EquationData } from './utils/ai';
 import { audioEngine } from './utils/audio';
 import { Loader2 } from 'lucide-react';
+import { IntroAnimation } from './components/IntroAnimation';
 
 export default function App() {
-  const [gameState, setGameState] = useState<'home' | 'modes' | 'loading' | 'playing' | 'gameover'>('home');
+  const [gameState, setGameState] = useState<'intro' | 'home' | 'modes' | 'loading' | 'playing' | 'gameover'>('intro');
   const [equations, setEquations] = useState<EquationData[]>([]);
   const [bpm, setBpm] = useState(100);
   
@@ -16,6 +17,7 @@ export default function App() {
   const [maxCombo, setMaxCombo] = useState(0);
   const [selectedMode, setSelectedMode] = useState('');
 
+  const handleIntroComplete = () => setGameState('home');
   const handleStartModes = () => setGameState('modes');
   const handleBackHome = () => setGameState('home');
 
@@ -55,6 +57,8 @@ export default function App() {
       <div className="absolute inset-0 bg-graph-paper opacity-60 z-0 pointer-events-none"></div>
       
       <div className="relative z-10 w-full h-full flex flex-col items-center">
+        {gameState === 'intro' && <IntroAnimation onComplete={handleIntroComplete} />}
+        
         {gameState === 'home' && <Hero onStart={handleStartModes} />}
         
         {gameState === 'modes' && (
