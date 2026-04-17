@@ -1,0 +1,6 @@
+{
+  "name": "PulseMath",
+  "description": "An educational rhythm-based math game where equations appear in sync with music beats.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

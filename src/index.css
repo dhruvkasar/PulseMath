@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Outfit", sans-serif;
+  --font-ui: "Inter", sans-serif;
+  --font-math: "Space Mono", monospace;
+
+  --animate-bounce-in: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  --animate-shake: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  --animate-expand-ring: expandRing var(--pulse-duration, 1s) cubic-bezier(0, 0.55, 0.45, 1) infinite;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.9) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-1deg); }
+  20%, 80% { transform: translate3d(3px, 0, 0) rotate(1deg); }
+  30%, 50%, 70% { transform: translate3d(-5px, 0, 0) rotate(-2deg); }
+  40%, 60% { transform: translate3d(5px, 0, 0) rotate(2deg); }
+}
+
+@keyframes expandRing {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui);
+  /* Locked screen to prevent ugly scrolling while typing numbers */
+  overflow: hidden; 
+  background-color: #fafaf9;
+  color: #0f172a;
+}
+
+/* Educational Graph Paper Background */
+.bg-graph-paper {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: center bottom;
+}
+
+/* Utility Fonts */
+.font-display { font-family: var(--font-display); }
+.font-math { font-family: var(--font-math); }
+.font-ui { font-family: var(--font-ui); }
+
+/* Math Index Card Look */
+.math-card {
+  background: #ffffff;
+  border: 3px solid #0f172a;
+  border-radius: 16px;
+  box-shadow: 6px 6px 0px rgba(15, 23, 42, 1);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Brutalist Push Button */
+.push-btn {
+  border: 3px solid #0f172a;
+  box-shadow: 4px 4px 0px rgba(15, 23, 42, 1);
+  transition: all 0.1s ease-out;
+}
+
+.push-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px rgba(15, 23, 42, 1);
+}
+
+/* Highlighter Accents */
+.hl-yellow { background-color: #fef08a; }
+.hl-pink { background-color: #fbcfe8; }
+.hl-cyan { background-color: #a5f3fc; }
+.hl-green { background-color: #bbf7d0; }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
