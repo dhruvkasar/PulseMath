@@ -59,7 +59,7 @@ export default function App() {
       <div className="relative z-10 w-full h-full flex flex-col items-center">
         {gameState === 'intro' && <IntroAnimation onComplete={handleIntroComplete} />}
         
-        {gameState === 'home' && <Hero onStart={handleStartModes} />}
+        {(gameState === 'intro' || gameState === 'home') && <Hero onStart={handleStartModes} />}
         
         {gameState === 'modes' && (
           <ModeSelector 
