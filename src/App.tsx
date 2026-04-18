@@ -7,6 +7,7 @@ import { generateEquations, EquationData } from './utils/ai';
 import { audioEngine } from './utils/audio';
 import { Loader2 } from 'lucide-react';
 import { IntroAnimation } from './components/IntroAnimation';
+import { ThemeToggle } from './components/ThemeToggle';
 
 export default function App() {
   const [gameState, setGameState] = useState<'intro' | 'home' | 'modes' | 'loading' | 'playing' | 'gameover'>('intro');
@@ -53,7 +54,8 @@ export default function App() {
   };
 
   return (
-    <div className="h-[100dvh] w-[100vw] overflow-hidden font-ui bg-[#fafaf9] text-slate-800 relative">
+    <div className="h-[100dvh] w-[100vw] overflow-hidden font-ui bg-[#fafaf9] text-slate-800 dark:bg-slate-900 dark:text-slate-100 relative">
+      <ThemeToggle />
       <div className="absolute inset-0 bg-graph-paper opacity-60 z-0 pointer-events-none"></div>
       
       <div className="relative z-10 w-full h-full flex flex-col items-center">
@@ -70,12 +72,12 @@ export default function App() {
 
         {gameState === 'loading' && (
           <div className="h-full w-full flex flex-col items-center justify-center relative z-10 px-6 text-center">
-            <Loader2 className="w-16 h-16 animate-spin text-slate-800 mb-6" />
-            <h2 className="text-3xl md:text-4xl font-display font-black uppercase text-slate-800 relative inline-block">
+            <Loader2 className="w-16 h-16 animate-spin text-slate-800 dark:text-slate-100 mb-6" />
+            <h2 className="text-3xl md:text-4xl font-display font-black uppercase text-slate-800 dark:text-slate-100 relative inline-block">
               <span className="relative z-10">Formatting Document...</span>
               <div className="absolute bottom-1 left-0 w-full h-3 hl-yellow -z-10 rotate-1"></div>
             </h2>
-            <p className="mt-4 font-math text-slate-500 text-sm">Generating mathematical variables.</p>
+            <p className="mt-4 font-math text-slate-500 dark:text-slate-400 text-sm">Generating mathematical variables.</p>
           </div>
         )}
 
