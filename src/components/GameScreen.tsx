@@ -190,17 +190,21 @@ export const GameScreen: React.FC<GameScreenProps> = ({ equations, bpm, onGameOv
           <form onSubmit={handleSubmit} className="w-full relative px-4">
             <input
               ref={inputRef}
-              type="number"
-              step="any"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9.\-]*"
+              maxLength={10}
               value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              onChange={e => {
+                 // Allow only numbers, decimals, and negative signs
+                 const val = e.target.value.replace(/[^0-9.\-]/g, '');
+                 if (val.length <= 10) setInputValue(val);
+              }}
               className="w-full text-center text-4xl font-math font-bold py-3 bg-slate-50 dark:bg-slate-800 border-b-4 border-slate-300 dark:border-slate-600 focus:border-slate-800 dark:focus:border-slate-100 focus:bg-white dark:focus:bg-slate-700 focus:outline-none transition-all text-slate-900 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-500"
               placeholder="?"
               autoFocus
               onBlur={() => {
-                // To keep mobile keyboard open, try refocussing unless deliberately unfocused 
-                // Careful: this can be annoying if mobile user is trying to dismiss keyboard explicitly
-                // inputRef.current?.focus()
+                // Keep mobile keyboard open if desired
               }}
             />
           </form>

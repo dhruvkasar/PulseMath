@@ -1,7 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { fallbackQuestions } from "./fallback";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export interface EquationData {
   equation: string;
@@ -18,54 +15,20 @@ export async function generateEquations(
   grade: string,
   count: number = 20
 ): Promise<EquationData[]> {
-  const prompt = `Generate ${count} math equations for a rhythm-based math game.
-  Mode: ${mode}
-  Grade Level: ${grade}
-  
-  The equations should progressively get slightly harder or vary in style within the chosen grade level to keep it engaging.
-  Return a JSON array of objects.
-  Return only clean numbers for the answer (e.g. 5, not "x=5" or "5.0"). If the answer is a fraction, try to constrain the game mode such that it evaluates to a whole number, OR provide the answer as a decimal if necessary, but whole numbers are highly preferred for the input box. Actually, for this game format, please stick to equations that result in integer answers.
-  
-  Format:
-  [
-    {
-      "equation": "string (e.g. '8 + 5', '3x = 12')",
-      "answer": number (e.g. 13, 4),
-      "difficulty": "string (e.g. 'easy', 'medium', 'hard')",
-      "hint": "string (e.g. 'Think about 8 + 2 + 3')"
-    }
-  ]`;
-
   try {
-    const apiCall = ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              equation: { type: Type.STRING },
-              answer: { type: Type.NUMBER },
-              difficulty: { type: Type.STRING },
-              hint: { type: Type.STRING },
-            },
-            required: ["equation", "answer", "difficulty", "hint"],
-          },
-        },
-      },
-    });
+    const apiCall = fetch(`/api/equations?mode=${encodeURIComponent(mode)}&grade=${encodeURIComponent(grade)}&count=${count}`)
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error('Server limit or failure');
+        }
+        return res.json();
+      });
 
     // Race the API call against a 20-second timeout
-    const response = await Promise.race([apiCall, timeoutPromise(20000)]);
-
-    const text = response.text || "[]";
-    const data: EquationData[] = JSON.parse(text);
+    const data: EquationData[] = await Promise.race([apiCall, timeoutPromise(20000)]);
     return data;
   } catch (error) {
-    console.error("API failed or timed out. Falling back to local emergency data:", error);
+    console.error("API failed, timed out, or rate-limited. Falling back to local data:", error);
     
     // Attempt to match the exact mode and grade first
     let matchingFallback = fallbackQuestions.filter(
