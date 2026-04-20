@@ -8,6 +8,7 @@ import { audioEngine } from './utils/audio';
 import { Loader2 } from 'lucide-react';
 import { IntroAnimation } from './components/IntroAnimation';
 import { ThemeToggle } from './components/ThemeToggle';
+import { Credits } from './components/Credits';
 
 export default function App() {
   const [gameState, setGameState] = useState<'intro' | 'home' | 'modes' | 'loading' | 'playing' | 'gameover'>('intro');
@@ -97,6 +98,15 @@ export default function App() {
             onRetry={handleRetry}
             onHome={handleBackHome}
           />
+        )}
+
+        {/* Hackathon Credits */}
+        {gameState !== 'playing' && gameState !== 'loading' && gameState !== 'intro' && (
+          <div className="absolute bottom-4 left-0 right-0 z-[100] flex justify-center pointer-events-none">
+            <div className="pointer-events-auto">
+              <Credits />
+            </div>
+          </div>
         )}
       </div>
     </div>
